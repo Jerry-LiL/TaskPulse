@@ -79,22 +79,18 @@ def test_list_jobs_with_filtering_and_pagination(client, auth_headers, db_sessio
         db_session.add(j)
     db_session.commit()
 
-    # Total list
     res = client.get("/api/v1/jobs", headers=auth_headers)
     assert res.status_code == status.HTTP_200_OK
     assert res.json()["total"] == 5
 
-    # Filter by status
     res = client.get("/api/v1/jobs?status=succeeded", headers=auth_headers)
     assert res.status_code == status.HTTP_200_OK
     assert res.json()["total"] == 2
 
-    # Filter by job_type
     res = client.get("/api/v1/jobs?job_type=notification", headers=auth_headers)
     assert res.status_code == status.HTTP_200_OK
     assert res.json()["total"] == 3
 
-    # Pagination
     res = client.get("/api/v1/jobs?limit=2&offset=0", headers=auth_headers)
     assert len(res.json()["items"]) == 2
 
@@ -121,7 +117,6 @@ def test_get_job_not_found(client, auth_headers):
 
 
 def test_get_job_other_user_forbidden(client, auth_headers, auth_headers2, db_session, test_user2):
-    # Job owned by user 2
     job = Job(
         user_id=test_user2.id,
         job_type="sleep",
@@ -131,7 +126,6 @@ def test_get_job_other_user_forbidden(client, auth_headers, auth_headers2, db_se
     db_session.add(job)
     db_session.commit()
 
-    # User 1 tries to access it
     res = client.get(f"/api/v1/jobs/{job.id}", headers=auth_headers)
     assert res.status_code == status.HTTP_403_FORBIDDEN
 
@@ -250,7 +244,6 @@ def test_delete_job_success(client, auth_headers, db_session, test_user):
     res = client.delete(f"/api/v1/jobs/{job.id}", headers=auth_headers)
     assert res.status_code == status.HTTP_204_NO_CONTENT
 
-    # Verify deleted
     assert db_session.query(Job).filter(Job.id == job.id).first() is None
 
 

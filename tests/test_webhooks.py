@@ -3,7 +3,6 @@ import hmac
 from unittest.mock import MagicMock, patch
 from fastapi import status
 import httpx
-import pytest
 
 from app.models.webhook import Webhook, WebhookDelivery
 from app.worker.webhook_dispatcher import (
@@ -227,7 +226,6 @@ def test_list_webhook_deliveries(client, auth_headers, db_session, test_user):
 
 
 def test_dispatch_event_to_user_webhooks(db_session, test_user):
-    # Active webhook listening to *
     wh = Webhook(
         user_id=test_user.id,
         url="https://example.com/dispatch",

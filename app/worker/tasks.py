@@ -44,7 +44,6 @@ def run_job_execution(db: Session, job_id: str) -> Job:
     job.started_at = utcnow()
     db.commit()
 
-    # Webhook for running
     try:
         dispatch_event_to_user_webhooks(
             db,
@@ -167,7 +166,6 @@ def process_due_schedules(db: Session, now: datetime | None = None) -> list[str]
 
     db.commit()
 
-    # Enqueue in Celery
     for j_id in triggered_job_ids:
         try:
             execute_job.delay(j_id)

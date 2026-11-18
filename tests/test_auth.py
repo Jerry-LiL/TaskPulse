@@ -1,5 +1,4 @@
 from fastapi import status
-from app.models.user import User
 
 
 def test_register_success(client):

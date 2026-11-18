@@ -11,7 +11,6 @@ class RateLimiter:
         if not settings.RATE_LIMIT_ENABLED:
             return
 
-        # Determine identifier: Bearer token or client IP
         auth_header = request.headers.get("Authorization")
         if auth_header and auth_header.startswith("Bearer "):
             identifier = f"token:{auth_header[7:30]}"
