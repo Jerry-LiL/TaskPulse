@@ -144,7 +144,6 @@ def test_patch_schedule_toggle_active(client, auth_headers, db_session, test_use
     db_session.add(sched)
     db_session.commit()
 
-    # Disable schedule
     res = client.patch(
         f"/api/v1/schedules/{sched.id}",
         headers=auth_headers,
@@ -154,7 +153,6 @@ def test_patch_schedule_toggle_active(client, auth_headers, db_session, test_use
     assert res.json()["is_active"] is False
     assert res.json()["next_run_at"] is None
 
-    # Re-enable schedule
     res = client.patch(
         f"/api/v1/schedules/{sched.id}",
         headers=auth_headers,
@@ -182,6 +180,28 @@ def test_patch_schedule_update_cron(client, auth_headers, db_session, test_user)
     )
     assert res.status_code == status.HTTP_200_OK
     assert res.json()["cron_expression"] == "*/10 * * * *"
+
+
+def test_patch_schedule_update_interval(client, auth_headers, db_session, test_user):
+    sched = Schedule(
+        user_id=test_user.id,
+        name="Update Interval",
+        job_type="sleep",
+        cron_expression="0 0 * * *",
+    )
+    db_session.add(sched)
+    db_session.commit()
+
+    res = client.patch(
+        f"/api/v1/schedules/{sched.id}",
+        headers=auth_headers,
+        json={"interval_seconds": 120},
+    )
+    assert res.status_code == status.HTTP_200_OK
+    data = res.json()
+    assert data["interval_seconds"] == 120
+    assert data["cron_expression"] is None
+    assert data["next_run_at"] is not None
 
 
 def test_delete_schedule(client, auth_headers, db_session, test_user):
