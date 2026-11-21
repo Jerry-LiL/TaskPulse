@@ -1,4 +1,5 @@
 from datetime import datetime
+from urllib.parse import urlparse
 from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -12,8 +13,11 @@ class WebhookCreate(BaseModel):
     @classmethod
     def validate_url(cls, v: str) -> str:
         clean = v.strip()
-        if not (clean.startswith("http://") or clean.startswith("https://")):
+        parsed = urlparse(clean)
+        if parsed.scheme not in ("http", "https"):
             raise ValueError("Webhook URL must begin with http:// or https://")
+        if not parsed.netloc:
+            raise ValueError("Webhook URL must include a host")
         return clean
 
 

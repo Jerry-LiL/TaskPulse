@@ -40,6 +40,15 @@ def test_create_webhook_invalid_url(client, auth_headers):
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
+def test_create_webhook_url_without_host(client, auth_headers):
+    response = client.post(
+        "/api/v1/webhooks",
+        headers=auth_headers,
+        json={"url": "https://"},
+    )
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
 def test_list_webhooks(client, auth_headers, db_session, test_user):
     wh = Webhook(
         user_id=test_user.id,
