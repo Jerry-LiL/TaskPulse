@@ -54,7 +54,14 @@ def list_jobs(
 ):
     query = db.query(Job).filter(Job.user_id == current_user.id)
     if status_filter:
-        query = query.filter(Job.status == status_filter.lower())
+        status_value = status_filter.lower()
+        valid = {js.value for js in JobStatus}
+        if status_value not in valid:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"status must be one of: {', '.join(sorted(valid))}",
+            )
+        query = query.filter(Job.status == status_value)
     if job_type:
         query = query.filter(Job.job_type == job_type.lower())
 

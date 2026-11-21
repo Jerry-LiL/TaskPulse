@@ -95,6 +95,12 @@ def test_list_jobs_with_filtering_and_pagination(client, auth_headers, db_sessio
     assert len(res.json()["items"]) == 2
 
 
+def test_list_jobs_unknown_status_rejected(client, auth_headers):
+    res = client.get("/api/v1/jobs?status=done", headers=auth_headers)
+    assert res.status_code == status.HTTP_400_BAD_REQUEST
+    assert "status must be one of" in res.json()["detail"]
+
+
 def test_get_job_by_id(client, auth_headers, db_session, test_user):
     job = Job(
         user_id=test_user.id,
